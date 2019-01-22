@@ -68,3 +68,14 @@ describe('getCurriencies', () => {
            expect(result).toEqual(expect.arrayContaining(['EUR', 'USD', 'AUD']))
        }) 
 })
+
+describe('getProduct', () => {
+    it('should return the product with the given id', () => {
+        const result = lib.getProduct(1);
+        // expect(result).toBe({id: 1, price: 10}); // toBe Matches refreneces
+        expect(result).toEqual({id: 1, price: 10});  // check exect same even protos
+        expect(result).toMatchObject({id:1, price:10});
+
+        expect(result).toHaveProperty('id', 1);  // type of data for key's value matter
+    })
+})
