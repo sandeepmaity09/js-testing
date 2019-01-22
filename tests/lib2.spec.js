@@ -59,6 +59,12 @@ describe('getCurriencies', () => {
 
 
            // PROPER WAY
-           
+           expect(result).toContain('USD');
+           expect(result).toContain('AUD');
+           expect(result).toContain('EUR');           
+
+
+           // Ideal Way : Balanced Way
+           expect(result).toEqual(expect.arrayContaining(['EUR', 'USD', 'AUD']))
        }) 
 })
