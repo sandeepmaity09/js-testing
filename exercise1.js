@@ -12,5 +12,5 @@ module.exports.fizzBuzz = function(input) {
   if (input % 5 === 0)
     return 'Buzz'; 
 
-  return input; 
+  return input;   
 }
