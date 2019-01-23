@@ -1,4 +1,6 @@
 const lib = require('../lib');
+const db = require('../db');
+const mail = require('../mail');
 
 describe('absolute', () => {
     it('absolute - should return a positive number if input is positive', () => {
@@ -90,20 +92,84 @@ describe('registerUser', () => {
         // We can't expect a result here cause this will throw error
 
         // expect(() => { lib.registerUser(null) }).toThrow();
-    
+
         // sometimes the test functions maybe few lines long in that case 
         // you can use parameterized test. NOT SUPPORTED BY JEST
 
         // Alternative Method
         const args = [null, undefined, NaN, '', 0, false];
         args.forEach(a => {
-            expect(() => { lib.registerUser(a) }).toThrow();            
+            expect(() => { lib.registerUser(a) }).toThrow();
         })
     });
 
     it('should return a user object if valid username is passed', () => {
         const result = lib.registerUser("Sandeep");
-        expect(result).toMatchObject({username: "Sandeep"})
+        expect(result).toMatchObject({ username: "Sandeep" })
         expect(result.id).toBeGreaterThan(0);
+    })
+})
+
+
+describe('applyDiscount', () => {
+    it('should apply 10% discount if customer has more than 10 points', () => {
+        db.getCustomerSync = function (customerId) {
+            console.log('Fake Reading console')
+            return { id: customerId, points: 20 };
+        }
+
+        const order = { customerId: 1, totalPrice: 10 };
+        lib.applyDiscount(order);
+        expect(order.totalPrice).toBe(9);
+    })
+})
+
+
+describe('notifyCustomer', () => {
+    it('should send an email to the customer', () => {
+        db.getCustomerSync = function (customerId) {
+            return { email: 'a' };
+        }
+
+        let mailSent = false;
+        mail.send = function (email, message) {
+            mailSent = true;
+        }
+        lib.notifyCustomer({ customerId: 1 });
+        expect(mailSent).toBe(true);
+    })
+})
+
+// jest Mock Functions
+
+describe('notifyCustomer', () => {
+    it('should send an email to the customer', () => {
+        
+        // const mockFunction = jest.fn();
+        // mockFunction.mockRejectedValue(1);
+        // mockFunction.mockResolvedValue(1);
+        // mockFunction.mockRejectedValue(new Error('...'));
+        // mockFunction();
+
+        // const result = await mockFunction();
+
+        // db.getCustomerSync = function (customerId) {
+        //     return { email: 'a' };
+        // }
+
+        // let mailSent = false;
+        // mail.send = function (email, message) {
+        //     mailSent = true;
+        // }
+
+        db.getCustomerSync = jest.fn().mockReturnValue({email: 'a'})
+        mail.send = jest.fn();
+        
+        lib.notifyCustomer({ customerId: 1 });
+        
+        // expect(mail.send).toHaveBeenCalled();        
+        // expect(mail.send).toHaveBeenCalledWith('a', '...');
+        expect(mail.send.mock.calls[0][0]).toBe('a');
+        expect(mail.send.mock.calls[0][1]).toMatch(/order/);
     })
 })
